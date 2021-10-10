@@ -1,40 +1,54 @@
+//handling complex state in React.Component
+
 import React, { useState } from "react";
 
 function App() {
-  const [fName, setFirstName] = useState("");
-  const [lName, setLastName] = useState("");
+  const [fullName, setFullName] = useState({
+    //passing an object to the useState function allows to get get a hold of both fName and lName.
+    fName: "",
+    lName: "",
+  });
 
   function handleClick() {
     console.log("I got clicked!");
   }
 
-  function onChangeFirstName(event) {
-    const firstName = event.target.value;
-    setFirstName(firstName);
-  }
+  function handleChange(event) {
+    const { value, name } = event.target;
 
-  function onChangeLastName(event) {
-    const lastName = event.target.value;
-    setLastName(lastName);
+    setFullName((prevValue) => {
+      //Do not try to access event inside the stateful setters as this is likely a synthetic event being reused.
+      if (name === "fName") {
+        return {
+          fName: value,
+          lName: prevValue.lName,
+        };
+      } else if (name === "lName") {
+        return {
+          lName: value,
+          fName: prevValue.fName,
+        };
+      }
+    });
   }
 
   return (
     <div className="container">
       <h1>
-        Hello {fName} {lName}
+        Hello {fullName.fName} {fullName.lName}
       </h1>
       <form>
         <input
-          onChange={onChangeFirstName}
+          onChange={handleChange}
           name="fName"
           placeholder="First Name"
-          value={fName}
+          value={fullName.fName}
         />
         <input
-          onChange={onChangeLastName}
+          onChange={handleChange}
           name="lName"
           placeholder="Last Name"
-          value={lName}
+          value={fullName.lName}
         />
         <button onClick={handleClick} type="submit">
           Submit
